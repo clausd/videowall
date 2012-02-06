@@ -95,9 +95,12 @@ __END__
       function play() {
         ytplayer = document.getElementById("myytplayer");
         if (ytplayer) {
-          ytplayer.loadVideoById("MJjpFYVvwBo");
+          ytplayer.cueVideoById("MJjpFYVvwBo");
         }
       }
+      // player.getPlaylist():Array
+      // player.playVideo()
+      // player.seekTo - working with player.getCurrentTime() for swipe actions
     </script>
     <a href="javascript:void(0);" onclick="play();">Play</a>
   </body>
