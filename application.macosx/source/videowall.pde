@@ -103,7 +103,7 @@ void draw() {
             fill(c);
             beginShape();
             vertex(0,-1);
-            vertex(1,0);  
+            vertex(1,0);
             vertex(0,1);
             vertex(-1,0);
             endShape();

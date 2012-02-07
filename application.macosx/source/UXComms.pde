@@ -3,7 +3,7 @@ import netP5.*;
 
 class UXComms {
   
-  float alfa = 0.8;
+  float alfa = 0.09;
   float dragged_x;
   float dragged_y;
   float avg_x;
@@ -29,7 +29,7 @@ class UXComms {
       avg_x = exp_avg(coords.x,avg_x);
       avg_y = exp_avg(coords.y,avg_y);
       dev_x = exp_deviation(coords.x,avg_x,dev_x);
-      dev_y = exp_deviation(coords.y,avg_y,dev_y);
+      dev_y = exp_deviation(coords.y,avg_x,dev_y);
       if (l2(dev_x,dev_y)> UXState.SWIPETHRESHOLD) {
         state = UXState.SWIPE;
       } else {
@@ -45,8 +45,7 @@ class UXComms {
     if (state == UXState.TOUCH || state == UXState.DRAG) {
       send(state,avg_x,avg_y);
     }
-//    print("Mass : " + mass + " avg : " + avg_x + "," + avg_y + " dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
-    println("dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
+    print("Mass : " + mass + " avg : " + avg_x + "," + avg_y + " dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
   }
   
   void observe_empty() {
@@ -84,8 +83,7 @@ class UXComms {
   }
   
   float exp_avg(float value, float last_avg) {
-//      println("v " + value + " a " + last_avg + " alfa" + alfa);
-      return alfa*value+(1-alfa)*last_avg; 
+    return alfa*value+(1-alfa)*last_avg; 
   }
 
   float exp_deviation(float value, float exp_avg, float last_dev) {

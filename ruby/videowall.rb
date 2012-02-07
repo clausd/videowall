@@ -17,37 +17,72 @@ if RUBY_VERSION < "1.9"
 end
 
 EM.run do
+  EventMachine.kqueue = true if EventMachine.kqueue?
   class MyWeb < Sinatra::Base
     enable :inline_templates
     get '/' do
       erb :index
     end
   end
+  module KinectWatcher
+    def process_exited
+      KinectWatcher.start_kinect
+    end
+    def self.start_kinect
+      curdir = Dir.pwd
+      begin
+        Dir.chdir('../application.macosx')
+        system('nohup ./videowall.app/Contents/MacOS/JavaApplicationStub &')
+      ensure
+        Dir.chdir(curdir)
+      end
+    end
+  end
   from_processing = OSC::EMServer.new( 12001 )
+  from_processing.add_method('/kinect/reload') do |message|
+    kinect_pid = `ps | grep videowall.app | grep -v grep`.split(' ').first.to_i
+    if kinect_pid > 0
+      p "Going to kill kinect process with PID " + kinect_pid.to_s
+      EM.defer do 
+        p 'Killing'
+        system('kill ' + kinect_pid.to_s)
+        sleep 10
+        KinectWatcher.start_kinect
+        system('osascript gotochrome.applescript')
+      end
+    else
+      p "No kinect process found"
+    end
+  end
+  from_processing.add_method('/test') do |message|
+    p "TEST from ux: " + message.to_a.inspect
+    ws.send(message.to_a.to_json)
+  end
   to_processing = OSC::Client.new( 'localhost', 12000 )
   EventMachine::WebSocket.start(:host => "0.0.0.0", :port => 8080) do |ws|
     from_processing.add_method('/kinect/hand') do |message|
-      ws.send(message.to_a.to_json)
+      p "Getting the message in state " + ws.state.to_s
+      if ws.state == :connected
+        ws.send(message.to_a.to_json)
+      end
     end
-    from_processing.add_method('/test') do |message|
-      p "TEST from ux: " + message.to_a.inspect
-      ws.send(message.to_a.to_json)
-    end
-    ws.onopen    { p "WebSocket open"; ws.send ["Open, says server"].to_json}
+    ws.onopen    { p "WebSocket open"; ws.send ["Open, says server"].to_json; }
     ws.onmessage do |msg| 
       if msg == "close"
         ws.send "Close"
         ws.close_connection(true)
       else
         p 'receiving ' + msg.inspect
-#        to_processing.send(OSC::Message.new("/hello", msg))
       end
     end
-    ws.onclose   { p "WebSocket closed" }
+    ws.onclose   { p "WebSocket closed" ; }
     ws.onerror {|error| p "Error: " + error.inspect}
   end
   from_processing.run
   MyWeb.run!({:port => 5000})
+  KinectWatcher.start_kinect
+  sleep 10
+  system('osascript gotochrome.applescript')
 end
 
 
@@ -68,7 +103,7 @@ __END__
       // comms
       ws = new WebSocket("ws://localhost:8080/websocket");
       debug("opening");
-      ws.onmessage = function(evt) { var obj = JSON.parse(evt.data); out = obj[0]; $("#msg").append("<p>"+out+"</p>"); };
+      ws.onmessage = function(evt) { window.focus(); var obj = JSON.parse(evt.data); debug(obj);};
       ws.onclose = function() { debug("close"); };
       ws.onopen = function()  { debug("open"); };
       Tap.socket = ws;
