@@ -142,7 +142,7 @@ public void draw() {
             fill(c);
             beginShape();
             vertex(0,-1);
-            vertex(1,0);
+            vertex(1,0);  
             vertex(0,1);
             vertex(-1,0);
             endShape();
@@ -307,7 +307,7 @@ class Kinectutils {
         int offset = x+y*w;
         // Convert kinect data to world xyz coordinate
         int rawDepth = _depth[offset];
-        totaldepth += offset*rawDepth;
+        totaldepth *= offset*rawDepth;
         if (rawDepth > 0) {
           PVector v = new PVector();
           _transform.mult(depthToWorld(x,y,rawDepth),v);
@@ -511,7 +511,7 @@ class Settings {
 
 class UXComms {
   
-  float alfa = 0.09f;
+  float alfa = 0.8f;
   float dragged_x;
   float dragged_y;
   float avg_x;
@@ -537,10 +537,10 @@ class UXComms {
       avg_x = exp_avg(coords.x,avg_x);
       avg_y = exp_avg(coords.y,avg_y);
       dev_x = exp_deviation(coords.x,avg_x,dev_x);
-      dev_y = exp_deviation(coords.y,avg_x,dev_y);
+      dev_y = exp_deviation(coords.y,avg_y,dev_y);
       if (l2(dev_x,dev_y)> UXState.SWIPETHRESHOLD) {
         state = UXState.SWIPE;
-      } else {
+      } else if (state != UXState.SWIPE) {
         if (l2(dev_x,dev_y)> UXState.DRAGTHRESHOLD) {
           state = UXState.DRAG;
         } else {
@@ -551,26 +551,27 @@ class UXComms {
       }
     }
     if (state == UXState.TOUCH || state == UXState.DRAG) {
-      send(state,avg_x,avg_y);
+      send(state,avg_x,avg_y,mass);
     }
-    print("Mass : " + mass + " avg : " + avg_x + "," + avg_y + " dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
+//    print("Mass : " + mass + " avg : " + avg_x + "," + avg_y + " dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
+    println("dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
   }
   
   public void observe_empty() {
     if (state == UXState.SWIPE) {
-      send(state, dragged_x, dragged_y, avg_x-dragged_x,avg_y-dragged_y); // swipe is: origin + 
+      send(state, dragged_x, dragged_y, 0, avg_x-dragged_x,avg_y-dragged_y); // swipe is: origin + 
       state = UXState.OFF;
     } else if (state != UXState.OFF) {
       state = UXState.OFF;
-      send(state,dragged_x, dragged_y); // signal click end (
+      send(state,dragged_x, dragged_y, 0); // signal click end (
     }
   }
   
-  public void send(int state, float x, float y) {
-    send(state, x, y, 0 , 0);
+  public void send(int state, float x, float y, float mass) {
+    send(state, x, y, mass, 0 , 0);
   }
   
-  public void send(int state, float x, float y, float dx, float dy) {
+  public void send(int state, float x, float y,float mass, float dx, float dy) {
     /* in the following different ways of creating osc messages are shown by example */
     OscMessage myMessage = new OscMessage("/kinect/hand");
     
@@ -578,6 +579,7 @@ class UXComms {
     
     myMessage.add(x);
     myMessage.add(y);
+    myMessage.add(mass);
     myMessage.add(dx);
     myMessage.add(dy);
   
@@ -591,7 +593,8 @@ class UXComms {
   }
   
   public float exp_avg(float value, float last_avg) {
-    return alfa*value+(1-alfa)*last_avg; 
+//      println("v " + value + " a " + last_avg + " alfa" + alfa);
+      return alfa*value+(1-alfa)*last_avg; 
   }
 
   public float exp_deviation(float value, float exp_avg, float last_dev) {
@@ -609,8 +612,8 @@ static class UXState {
   static int CLICK = 2; // this is not important
   static int DRAG = 3;
   static int SWIPE = 4;
-  static float DRAGTHRESHOLD = 40;   // clearly need to work on good values here....
-  static float SWIPETHRESHOLD = 200;
+  static float DRAGTHRESHOLD = 4;   // clearly need to work on good values here....
+  static float SWIPETHRESHOLD = 20;
 }
 
   static public void main(String args[]) {

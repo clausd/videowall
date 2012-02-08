@@ -73,7 +73,7 @@ class Kinectutils {
         int offset = x+y*w;
         // Convert kinect data to world xyz coordinate
         int rawDepth = _depth[offset];
-        totaldepth += offset*rawDepth;
+        totaldepth *= offset*rawDepth;
         if (rawDepth > 0) {
           PVector v = new PVector();
           _transform.mult(depthToWorld(x,y,rawDepth),v);

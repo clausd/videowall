@@ -32,7 +32,7 @@ class UXComms {
       dev_y = exp_deviation(coords.y,avg_y,dev_y);
       if (l2(dev_x,dev_y)> UXState.SWIPETHRESHOLD) {
         state = UXState.SWIPE;
-      } else {
+      } else if (state != UXState.SWIPE) {
         if (l2(dev_x,dev_y)> UXState.DRAGTHRESHOLD) {
           state = UXState.DRAG;
         } else {
@@ -43,7 +43,7 @@ class UXComms {
       }
     }
     if (state == UXState.TOUCH || state == UXState.DRAG) {
-      send(state,avg_x,avg_y);
+      send(state,avg_x,avg_y,mass);
     }
 //    print("Mass : " + mass + " avg : " + avg_x + "," + avg_y + " dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
     println("dev : " + l2(dev_x,dev_y) + " state : " + state + " - ");
@@ -51,19 +51,19 @@ class UXComms {
   
   void observe_empty() {
     if (state == UXState.SWIPE) {
-      send(state, dragged_x, dragged_y, avg_x-dragged_x,avg_y-dragged_y); // swipe is: origin + 
+      send(state, dragged_x, dragged_y, 0, avg_x-dragged_x,avg_y-dragged_y); // swipe is: origin + 
       state = UXState.OFF;
     } else if (state != UXState.OFF) {
       state = UXState.OFF;
-      send(state,dragged_x, dragged_y); // signal click end (
+      send(state,dragged_x, dragged_y, 0); // signal click end (
     }
   }
   
-  void send(int state, float x, float y) {
-    send(state, x, y, 0 , 0);
+  void send(int state, float x, float y, float mass) {
+    send(state, x, y, mass, 0 , 0);
   }
   
-  void send(int state, float x, float y, float dx, float dy) {
+  void send(int state, float x, float y,float mass, float dx, float dy) {
     /* in the following different ways of creating osc messages are shown by example */
     OscMessage myMessage = new OscMessage("/kinect/hand");
     
@@ -71,6 +71,7 @@ class UXComms {
     
     myMessage.add(x);
     myMessage.add(y);
+    myMessage.add(mass);
     myMessage.add(dx);
     myMessage.add(dy);
   
