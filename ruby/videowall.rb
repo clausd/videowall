@@ -252,11 +252,14 @@ __END__
         }
       }
   //    cueVideo('vjvbjLcQ2T0',100,100,400,225);
-      cueVideo('zRUVQcM4WQ4',200,200,400,225);
+//      cueVideo('zRUVQcM4WQ4',200,200,400,225);
       cueVideo('FaW7JX4Xql0',300,300,400,225);
 //      cueVideo('kjiPD17f7-I',400,400,400,225);
-      cueVideo('2STTNYNF4lk',500,100,400,225);
+//      cueVideo('2STTNYNF4lk',500,100,400,225);
       cueVideo('2-2_2k6F0fw',600,300,400,225);
+      cueVideo('Ys5iU_4w73Y',100,100,400,225);
+      cueVideo('lNhB17v4b2g',400,100,400,225);
+      cueVideo('X1Wqt1X8bXs',800,300,400,225);
     });
     </script>
     <style>
