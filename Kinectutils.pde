@@ -203,9 +203,9 @@ class Kinectutils {
       front = s.readFloat();
       back = s.readFloat();
       if (lines >= 20) {
-        enable_stats = false;
         minz = s.readFloat();
         maxz = s.readFloat();
+        enable_stats = false;
       }
     }
   }

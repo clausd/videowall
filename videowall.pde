@@ -85,7 +85,7 @@ void draw() {
         int offset = x+y*ku.w;
         PVector v = ku.world[offset];
         // draw only pixels in desirable box of pixels.....
-        if (v.z<ku.maxz-ku.back && ku.minz-ku.front < v.z) {
+          if (v.z<ku.maxz-ku.back && ku.minz-ku.front < v.z) {
           stroke(255);
           pushMatrix();
           float factor = 600;

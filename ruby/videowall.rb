@@ -251,8 +251,12 @@ __END__
           }
         }
       }
-      cueVideo('MJjpFYVvwBo',100,100,400,225);
-      cueVideo('QcgoGgpyF80',600,100,400,225);
+  //    cueVideo('vjvbjLcQ2T0',100,100,400,225);
+      cueVideo('zRUVQcM4WQ4',200,200,400,225);
+      cueVideo('FaW7JX4Xql0',300,300,400,225);
+//      cueVideo('kjiPD17f7-I',400,400,400,225);
+      cueVideo('2STTNYNF4lk',500,100,400,225);
+      cueVideo('2-2_2k6F0fw',600,300,400,225);
     });
     </script>
     <style>
@@ -274,7 +278,7 @@ __END__
   </head>
   <body>
     <div id="debug" style="display:none;"></div>
-    <div id="calibrate"><a href="javascript:void(0);" onclick="calibrate();">Calibrate</a></div>
+    <!-- <div id="calibrate"><a href="javascript:void(0);" onclick="calibrate();">Calibrate</a></div> -->
     
     <div id="playzone" class="activearea" style="float:left; width:100%; height:300px;">PLAY</div>
     <!-- <div id="infozone" class="activearea" style="float:left; width:50%; height:300px;">INFO</div> -->
